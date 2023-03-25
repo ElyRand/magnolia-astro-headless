@@ -1,5 +1,5 @@
 title: 'React: Basic'
-baseUrl: http://localhost:3000
+baseUrl: http://localhost:3001
 routeTemplate: '/{language}{{@path}}'
 # templateScript: /react-minimal-lm/webresources/build/index.html
 dialog: spa-lm:pages/basic

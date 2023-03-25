@@ -1,4 +1,4 @@
-title: 'Vue: Contact'
+title: 'Astro: Contact'
 baseUrl: http://localhost:3000
 routeTemplate: '/{language}{{@path}}'
 dialog: spa-lm:pages/basic
