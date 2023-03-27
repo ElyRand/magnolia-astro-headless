@@ -23,11 +23,13 @@ class EditableComponent extends HTMLElement {
     const variantContent = theAnnotation
       ? PersonalizationService.getVariant(content, theAnnotation)
       : content;
+
+    // TODO: Where should it be used ?
     const renderingContent = TemplateAnnotations.generateMissingAreas(
       variantContent,
       theAnnotation
     );
-    console.log({ missing: renderingContent });
+
     const component = document.createElement("div");
     const toRender = componentMappings[content["mgnl:template"]];
     component.innerHTML = toRender || JSON.stringify(content["mgnl:template"]);

@@ -11,10 +11,8 @@ class EditableArea extends HTMLElement {
   }
 
   connectedCallback() {
-    // this.innerHTML = `<h2>editable-area</h2>`;
-    console.log("connected !!", this.attributes);
     const content = JSON.parse(this.getAttribute("content"));
-    console.log({ content });
+    // TODO when to use the parenttemplateid?
     const parentTemplateId = JSON.parse(this.getAttribute("parentTemplateId"));
     const annotations = JSON.parse(this.getAttribute("annotations"));
 
@@ -30,8 +28,6 @@ class EditableArea extends HTMLElement {
       (nodeName) => content[nodeName]
     );
 
-    console.log({ componentContents });
-
     componentContents.forEach((item, index) => {
       const component = document.createElement("editable-component");
       component.setAttribute("content", JSON.stringify(item));
@@ -42,7 +38,7 @@ class EditableArea extends HTMLElement {
 
     console.log({ componentContents });
 
-    //comments 2
+    //comments for closing
     const closingComment = document.createComment(
       constants.CLOSED_AREA_COMMENT
     );
