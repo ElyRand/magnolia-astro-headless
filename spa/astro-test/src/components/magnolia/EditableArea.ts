@@ -1,6 +1,4 @@
 import { constants } from "../../utils/mapping";
-import EditableComment from "./EditableComment";
-import EditableComponent from "./EditableComponent";
 
 class EditableArea extends HTMLElement {
   static get observedAttributes() {

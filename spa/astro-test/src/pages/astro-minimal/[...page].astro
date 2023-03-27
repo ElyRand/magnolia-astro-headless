@@ -1,5 +1,5 @@
 ---
-import EditableArea from "../../components/magnolia/EditableArea";
+import MainLayout from "../../layouts/MainLayout.astro";
 
 export async function getStaticPaths() {
   const defaultBaseUrl = "http://localhost:8080/magnoliaAuthor";
@@ -59,35 +59,30 @@ export async function getStaticPaths() {
   getStaticPath(nav, paths);
 
   console.log("SENT PATHS", JSON.stringify(paths, null, 2));
-  // return [
-  //   { params: { page: 'contact/contact' } },
-  //   {
-  //     params: { page: undefined },
-  //   }
-  // ]
-  return paths;
+  return [
+    { params: { page: 'astro-minimal' } },
+    {
+      params: { page: undefined },
+    }
+  ]
+  // return paths;
 }
 
 const content = await fetch(
-  "http://localhost:8080/magnoliaAuthor/.rest/delivery/pages/v1/react-minimal/"
+  "http://localhost:8080/magnoliaAuthor/.rest/delivery/pages/v1/astro-minimal/"
 ).then((res) => res.json());
 const templateAnnotations = await fetch(
-  "http://localhost:8080/magnoliaAuthor/.rest/template-annotations/v1/react-minimal/"
+  "http://localhost:8080/magnoliaAuthor/.rest/template-annotations/v1/astro-minimal/"
 ).then((res) => res.json());
-console.log(templateAnnotations);
----
 
+
+---
 <html>
   <head>
     <title>Basic</title>
   </head>
   <body class="max-w-md mx-auto">
-    <h1>Basic</h1>
-    <editable-page
-      content={JSON.stringify(content)}
-      annotations={JSON.stringify(templateAnnotations)}
-    >
-    </editable-page>
+    <MainLayout content={content} templateAnnotations={templateAnnotations} title="Basic Page">
 
     <h1>Main</h1>
     <editable-area
@@ -102,80 +97,23 @@ console.log(templateAnnotations);
       annotations={JSON.stringify(templateAnnotations)}
     >
     </editable-area>
+  </MainLayout>
   </body>
 </html>
-<script>
-  import  provideCivicUiDesignSystem from "../../utils/register";
 
-  provideCivicUiDesignSystem();
-</script>
+
 
 <script>
-  import {
-    PageEditorBridge,
-    PersonalizationService,
-    TemplateAnnotations,
-  } from "@magnolia/template-annotations";
-
+  import provideCivicUiDesignSystem from "../../utils/register";
   import EditableArea from "../../components/magnolia/EditableArea";
-
-  import EditableComment from "../../components/magnolia/EditableComment";
-
   import EditableComponent from "../../components/magnolia/EditableComponent";
+  import EditablePage from "../../components/magnolia/EditablePage";
 
-  // Define the behaviour for our new type of HTML element.
-  class EditablePage extends HTMLElement {
-    static get observedAttributes() {
-      return ["content", "annotations"];
-    }
-    _wrappedTemplateAnnotations = {};
-    _content = {};
-    _annotations = {};
+  // Register the design system with the page
+  provideCivicUiDesignSystem();
 
-    constructor() {
-      super();
-    }
-
-    connectedCallback() {
-      PageEditorBridge.init(() => console.log("connected to bridge"));
-      PageEditorBridge.onMessage("updateState", (message) => {
-        console.log("received update message from bridge");
-        const annotations = JSON.parse(this.getAttribute("annotations"));
-        const content = JSON.parse(this.getAttribute("content"));
-        console.log({ annotations });
-        if (!content) return;
-        const wrappedContent = TemplateAnnotations.generateMissingAreas(
-          content,
-          annotations
-        );
-        const renderingContent = annotations
-          ? PersonalizationService.getVariant(wrappedContent, annotations)
-          : wrappedContent;
-        console.log({ renderingContent });
-        const wrappedTemplateAnnotations = PersonalizationService.wrap(
-          annotations,
-          message.selectedComponentVariants
-        );
-        const theAnnotations = wrappedTemplateAnnotations[content["@path"]];
-        this.render(content, wrappedTemplateAnnotations, theAnnotations);
-      });
-    }
-
-    render(
-      content: object,
-      wrappedTemplateAnnotations: object,
-      theAnnotations: string
-    ) {
-      //comment
-      const comment = document.createComment(theAnnotations);
-      comment.textContent = theAnnotations;
-
-      this.prepend(comment);
-      //area
-    }
-  }
+  // Register the magnolia custom elements
   customElements.define("editable-page", EditablePage);
   customElements.define("editable-area", EditableArea);
-  customElements.define("editable-comment", EditableComment);
   customElements.define("editable-component", EditableComponent);
 </script>

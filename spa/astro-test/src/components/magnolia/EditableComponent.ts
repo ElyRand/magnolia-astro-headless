@@ -31,8 +31,9 @@ class EditableComponent extends HTMLElement {
     const component = document.createElement("div");
     const toRender = componentMappings[content["mgnl:template"]];
     component.innerHTML = toRender || JSON.stringify(content["mgnl:template"]);
+
     if (toRender) {
-      // TODO: this is a hack to get the component to render
+      // TODO: this is a hack to get the component to render. Maybe a component factory would be better?
       this.append(component);
       switch (toRender) {
         case "oc-headline":

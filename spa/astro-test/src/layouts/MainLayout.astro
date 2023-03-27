@@ -1,0 +1,35 @@
+---
+const { content, templateAnnotations, title } = Astro.props;
+console.log({ title });
+---
+
+<html>
+  <head>
+    <title>Basic</title>
+  </head>
+  <body class="max-w-md mx-auto">
+    <h1>{title}</h1>
+    <editable-page
+      content={JSON.stringify(content)}
+      annotations={JSON.stringify(templateAnnotations)}
+    >
+    </editable-page>
+    <!-- TODO the slot should be in beetwwen editable-page ? -->
+    <slot />
+  </body>
+</html>
+
+<script>
+  import provideCivicUiDesignSystem from "../utils/register";
+  import EditableArea from "../components/magnolia/EditableArea";
+  import EditableComponent from "../components/magnolia/EditableComponent";
+  import EditablePage from "../components/magnolia/EditablePage";
+
+  // Register the design system with the page
+  provideCivicUiDesignSystem();
+
+  // Register the magnolia custom elements
+  customElements.define("editable-page", EditablePage);
+  customElements.define("editable-area", EditableArea);
+  customElements.define("editable-component", EditableComponent);
+</script>
