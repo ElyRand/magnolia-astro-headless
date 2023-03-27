@@ -11,7 +11,11 @@ const Test = html`<div>Test</div>`;
 const styles = (
   context: ElementDefinitionContext,
   definition: FoundationElementDefinition
-) => css``;
+) => css`
+  div {
+    color: red;
+  }
+`;
 
 const template = (
   context: ElementDefinitionContext,

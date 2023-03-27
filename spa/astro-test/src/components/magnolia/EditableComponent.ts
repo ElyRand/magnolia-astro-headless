@@ -32,14 +32,18 @@ class EditableComponent extends HTMLElement {
     const toRender = componentMappings[content["mgnl:template"]];
     component.innerHTML = toRender || JSON.stringify(content["mgnl:template"]);
     if (toRender) {
+      // TODO: this is a hack to get the component to render
+      this.append(component);
       switch (toRender) {
         case "oc-headline":
           const headline = document.createElement("oc-headline");
           headline.setAttribute("title", content["text"]);
           this.appendChild(headline);
           break;
+        default:
+          const element = document.createElement(toRender);
+          this.appendChild(element);
       }
-      console.log("yolo", content);
     } else {
       this.appendChild(component);
     }

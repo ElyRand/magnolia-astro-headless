@@ -14,28 +14,26 @@ export class Headline extends FoundationElement {
   @attr title = "";
 }
 
-const headlineTemplate = (
+const imageTemplate = (
   context: ElementDefinitionContext,
   definition: HeadlineDefinition
 ) => {
-  console.log("headlineTemplate", context, definition);
-  return html` <h1>${(x) => x.getAttribute("title")}</h1> `;
+  return html`<span> Image here </span>`;
 };
 
 const styles = (context: ElementDefinitionContext) => `
     :host {
         display: block;
-        color:grey;
+        color:orange;
         text-align: center;
     }
 `;
 
 export default Headline.compose<HeadlineDefinition>({
-  baseName: "headline",
-  template: headlineTemplate,
+  baseName: "image",
+  template: imageTemplate,
   styles,
   shadowOptions: {
     mode: "open",
   },
-  title: "test",
 });

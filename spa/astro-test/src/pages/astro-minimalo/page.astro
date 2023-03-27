@@ -1,0 +1,69 @@
+---
+export async function getStaticPaths() {
+  const defaultBaseUrl = "http://localhost:8080/magnoliaAuthor";
+  const pagesApi = defaultBaseUrl + "/.rest/delivery/pages/v1";
+  const templateAnnotationsApi =
+    defaultBaseUrl + "/.rest/template-annotations/v1";
+  const pagenavApi = defaultBaseUrl + "/.rest/delivery/pagenav/v1";
+
+  async function getStaticPath(node: any, paths: any[]) {
+    let pathname = node["@path"].replace(nodeName, "");
+    // console.log({ node: node["@path"], pathname });
+    pathname = pathname.split("/");
+
+    pathname.shift();
+    // console.log({ pathname });
+    // TODO: add language support
+    ["en"].forEach(async(language, i) => {
+      // let i18nPathname = JSON.parse(JSON.stringify(pathname));
+      
+      // if (i !== 0) i18nPathname.unshift(language);
+      // console.log({ i18nPathname });
+      
+      // const thePath = i18nPathname.join("/");
+      // const content = await fetch(
+      // defaultBaseUrl + pagesApi +thePath
+      // ).then((res) => res.json());
+
+      // paths.push({
+      //   params: {
+      //     page: i18nPathname.length ? i18nPathname.join("/") : undefined,
+      //   },
+      // });
+      // console.log("HOOLLAAA",{paths})
+      
+
+    });
+
+    // node["@nodes"].forEach((nodeName) => getStaticPath(node[nodeName], paths));
+  }
+  const nodeName = "/astro-minimal";
+
+  let paths = [];
+
+  const navRes = await fetch(pagenavApi + nodeName);
+  if (!navRes.ok) {
+    return { paths: [], fallback: false };
+  }
+  const nav = await navRes.json();
+
+  // console.error("EEROOO", nav);
+  getStaticPath(nav, paths);
+
+  // console.log("SENT PATHS", JSON.stringify(paths, null, 2));
+  // return [
+  //   { params: { page: 'contact/contact' } },
+  //   {
+  //     params: { page: undefined },
+  //   }
+  // ]
+  return paths;
+}
+---
+
+<!-- <Debug {dev} /> -->
+<html>
+  <head><title>Welcome</title></head>
+
+  <body> Yeah</body>
+</html>

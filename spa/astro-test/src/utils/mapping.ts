@@ -5,6 +5,7 @@ export const componentMappings = {
 
   "spa-lm:components/headline": "oc-headline",
   "spa-lm:components/paragraph": "oc-test",
+  "spa-lm:components/image": "oc-image",
 } as const;
 
 export const constants = {

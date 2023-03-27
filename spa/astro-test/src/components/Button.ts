@@ -1,4 +1,5 @@
 import {
+  Button,
   ElementDefinitionContext,
   FoundationElement,
   FoundationElementDefinition,
@@ -10,11 +11,11 @@ interface HeadlineDefinition extends FoundationElementDefinition {
   title?: string;
 }
 
-export class Headline extends FoundationElement {
+export class CustomButton extends Button {
   @attr title = "";
 }
 
-const headlineTemplate = (
+const buttonTemplate = (
   context: ElementDefinitionContext,
   definition: HeadlineDefinition
 ) => {
@@ -23,16 +24,14 @@ const headlineTemplate = (
 };
 
 const styles = (context: ElementDefinitionContext) => `
-    :host {
-        display: block;
-        color:grey;
-        text-align: center;
-    }
-`;
+      :host {
+          display: block;
+      }
+  `;
 
-export default Headline.compose<HeadlineDefinition>({
+export default CustomButton.compose<HeadlineDefinition>({
   baseName: "headline",
-  template: headlineTemplate,
+  template: buttonTemplate,
   styles,
   shadowOptions: {
     mode: "open",

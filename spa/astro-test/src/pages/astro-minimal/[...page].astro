@@ -1,0 +1,181 @@
+---
+import EditableArea from "../../components/magnolia/EditableArea";
+
+export async function getStaticPaths() {
+  const defaultBaseUrl = "http://localhost:8080/magnoliaAuthor";
+  const pagesApi = defaultBaseUrl + "/.rest/delivery/pages/v1";
+  const templateAnnotationsApi =
+    defaultBaseUrl + "/.rest/template-annotations/v1";
+  const pagenavApi = defaultBaseUrl + "/.rest/delivery/pagenav/v1";
+
+  async function getStaticPath(node: any, paths: any[]) {
+    let pathname = node["@path"].replace(nodeName, "");
+    // console.log({ node: node["@path"], pathname });
+    pathname = pathname.split("/");
+
+    pathname.shift();
+    // console.log({ pathname });
+    // TODO: add language support
+    ["en"].forEach(async(language, i) => {
+      let i18nPathname = JSON.parse(JSON.stringify(pathname));
+      
+      if (i !== 0) i18nPathname.unshift(language);
+      console.log("ligne 21",{ i18nPathname });
+      
+      const thePath = i18nPathname.join("/");
+      console.log({thePath})
+      // const contentEndpoint =pagesApi +"/" +thePath;
+      // // const content = await fetch(
+      // // contentEndpoint
+      // // ).then((res) => res.json());
+
+      console.log({
+        params: {
+          page: i18nPathname.length ? i18nPathname.join("/") : undefined,
+        },
+      })
+      paths.push({
+        params: {
+          page: i18nPathname.length ? i18nPathname.join("/") : undefined,
+        },
+      });
+    });
+    console.log("HOOLLAAA",{paths})
+
+    node["@nodes"].forEach((nodeName) => getStaticPath(node[nodeName], paths));
+  }
+  const nodeName = "/astro-minimal";
+  // const nodeName = "";
+
+  let paths = [];
+
+  const navRes = await fetch(pagenavApi + nodeName);
+  if (!navRes.ok) {
+    return { paths: [], fallback: false };
+  }
+  const nav = await navRes.json();
+
+  // console.error("EEROOO", nav);
+  getStaticPath(nav, paths);
+
+  console.log("SENT PATHS", JSON.stringify(paths, null, 2));
+  // return [
+  //   { params: { page: 'contact/contact' } },
+  //   {
+  //     params: { page: undefined },
+  //   }
+  // ]
+  return paths;
+}
+
+const content = await fetch(
+  "http://localhost:8080/magnoliaAuthor/.rest/delivery/pages/v1/react-minimal/"
+).then((res) => res.json());
+const templateAnnotations = await fetch(
+  "http://localhost:8080/magnoliaAuthor/.rest/template-annotations/v1/react-minimal/"
+).then((res) => res.json());
+console.log(templateAnnotations);
+---
+
+<html>
+  <head>
+    <title>Basic</title>
+  </head>
+  <body class="max-w-md mx-auto">
+    <h1>Basic</h1>
+    <editable-page
+      content={JSON.stringify(content)}
+      annotations={JSON.stringify(templateAnnotations)}
+    >
+    </editable-page>
+
+    <h1>Main</h1>
+    <editable-area
+      content={JSON.stringify(content["main"])}
+      annotations={JSON.stringify(templateAnnotations)}
+    >
+    </editable-area>
+
+    <h1>Extras</h1>
+    <editable-area
+      content={JSON.stringify(content["extras"])}
+      annotations={JSON.stringify(templateAnnotations)}
+    >
+    </editable-area>
+  </body>
+</html>
+<script>
+  import  provideCivicUiDesignSystem from "../../utils/register";
+
+  provideCivicUiDesignSystem();
+</script>
+
+<script>
+  import {
+    PageEditorBridge,
+    PersonalizationService,
+    TemplateAnnotations,
+  } from "@magnolia/template-annotations";
+
+  import EditableArea from "../../components/magnolia/EditableArea";
+
+  import EditableComment from "../../components/magnolia/EditableComment";
+
+  import EditableComponent from "../../components/magnolia/EditableComponent";
+
+  // Define the behaviour for our new type of HTML element.
+  class EditablePage extends HTMLElement {
+    static get observedAttributes() {
+      return ["content", "annotations"];
+    }
+    _wrappedTemplateAnnotations = {};
+    _content = {};
+    _annotations = {};
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      PageEditorBridge.init(() => console.log("connected to bridge"));
+      PageEditorBridge.onMessage("updateState", (message) => {
+        console.log("received update message from bridge");
+        const annotations = JSON.parse(this.getAttribute("annotations"));
+        const content = JSON.parse(this.getAttribute("content"));
+        console.log({ annotations });
+        if (!content) return;
+        const wrappedContent = TemplateAnnotations.generateMissingAreas(
+          content,
+          annotations
+        );
+        const renderingContent = annotations
+          ? PersonalizationService.getVariant(wrappedContent, annotations)
+          : wrappedContent;
+        console.log({ renderingContent });
+        const wrappedTemplateAnnotations = PersonalizationService.wrap(
+          annotations,
+          message.selectedComponentVariants
+        );
+        const theAnnotations = wrappedTemplateAnnotations[content["@path"]];
+        this.render(content, wrappedTemplateAnnotations, theAnnotations);
+      });
+    }
+
+    render(
+      content: object,
+      wrappedTemplateAnnotations: object,
+      theAnnotations: string
+    ) {
+      //comment
+      const comment = document.createComment(theAnnotations);
+      comment.textContent = theAnnotations;
+
+      this.prepend(comment);
+      //area
+    }
+  }
+  customElements.define("editable-page", EditablePage);
+  customElements.define("editable-area", EditableArea);
+  customElements.define("editable-comment", EditableComment);
+  customElements.define("editable-component", EditableComponent);
+</script>
