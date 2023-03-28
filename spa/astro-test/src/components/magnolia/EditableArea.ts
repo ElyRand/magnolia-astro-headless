@@ -7,7 +7,6 @@ class EditableArea extends HTMLElement {
 
   constructor() {
     super();
-    console.log("connected !!");
   }
 
   connectedCallback() {
@@ -35,8 +34,6 @@ class EditableArea extends HTMLElement {
       component.setAttribute("annotations", this.getAttribute("annotations"));
       this.appendChild(component);
     });
-
-    console.log({ componentContents });
 
     //comments for closing
     const closingComment = document.createComment(

@@ -18,7 +18,6 @@ const headlineTemplate = (
   context: ElementDefinitionContext,
   definition: HeadlineDefinition
 ) => {
-  console.log("headlineTemplate", context, definition);
   return html` <h1>${(x) => x.getAttribute("title")}</h1> `;
 };
 

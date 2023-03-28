@@ -5,7 +5,6 @@ import { componentMappings, constants } from "../../utils/mapping";
 class EditableComponent extends HTMLElement {
   constructor() {
     super();
-    console.log("EditableComponent constructor");
   }
 
   connectedCallback() {

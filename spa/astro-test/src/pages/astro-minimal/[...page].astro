@@ -10,37 +10,28 @@ export async function getStaticPaths() {
 
   async function getStaticPath(node: any, paths: any[]) {
     let pathname = node["@path"].replace(nodeName, "");
-    // console.log({ node: node["@path"], pathname });
     pathname = pathname.split("/");
 
     pathname.shift();
-    // console.log({ pathname });
     // TODO: add language support
     ["en"].forEach(async(language, i) => {
       let i18nPathname = JSON.parse(JSON.stringify(pathname));
       
       if (i !== 0) i18nPathname.unshift(language);
-      console.log("ligne 21",{ i18nPathname });
       
+      // TODO:  get the page content (and template) to send as props
       const thePath = i18nPathname.join("/");
-      console.log({thePath})
       // const contentEndpoint =pagesApi +"/" +thePath;
       // // const content = await fetch(
       // // contentEndpoint
       // // ).then((res) => res.json());
 
-      console.log({
-        params: {
-          page: i18nPathname.length ? i18nPathname.join("/") : undefined,
-        },
-      })
       paths.push({
         params: {
           page: i18nPathname.length ? i18nPathname.join("/") : undefined,
         },
       });
     });
-    console.log("HOOLLAAA",{paths})
 
     node["@nodes"].forEach((nodeName) => getStaticPath(node[nodeName], paths));
   }
@@ -55,10 +46,9 @@ export async function getStaticPaths() {
   }
   const nav = await navRes.json();
 
-  // console.error("EEROOO", nav);
   getStaticPath(nav, paths);
 
-  console.log("SENT PATHS", JSON.stringify(paths, null, 2));
+  // TODO: send the real paths, not hardcoded one
   return [
     { params: { page: 'astro-minimal' } },
     {

@@ -38,7 +38,6 @@ class EditablePage extends HTMLElement {
     wrappedTemplateAnnotations: object,
     theAnnotations: string
   ) {
-    console.log("rendering", { theAnnotations, content });
     const div = document.createElement("div");
     //comment
     const comment = document.createComment(theAnnotations);
