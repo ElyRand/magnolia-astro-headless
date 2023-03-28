@@ -1,7 +1,8 @@
 // import Basic from "../components/pages/";
 
 export const componentMappings = {
-  "vue-minimal-lm:pages/basic": "Basic",
+  "astro-minimal-lm:pages/contact": "Contact",
+  "astro-minimal-lm:pages/basic": "Basic",
 
   "spa-lm:components/headline": "oc-headline",
   "spa-lm:components/paragraph": "oc-test",

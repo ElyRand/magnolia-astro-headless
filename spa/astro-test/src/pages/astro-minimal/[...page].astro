@@ -4,8 +4,6 @@ import MainLayout from "../../layouts/MainLayout.astro";
 export async function getStaticPaths() {
   const defaultBaseUrl = "http://localhost:8080/magnoliaAuthor";
   const pagesApi = defaultBaseUrl + "/.rest/delivery/pages/v1";
-  const templateAnnotationsApi =
-    defaultBaseUrl + "/.rest/template-annotations/v1";
   const pagenavApi = defaultBaseUrl + "/.rest/delivery/pagenav/v1";
 
   async function getStaticPath(node: any, paths: any[]) {
@@ -13,85 +11,95 @@ export async function getStaticPaths() {
     pathname = pathname.split("/");
 
     pathname.shift();
-    // TODO: add language support
-    ["en"].forEach(async(language, i) => {
-      let i18nPathname = JSON.parse(JSON.stringify(pathname));
-      
+    // TODO: add more language support
+    const processLangages = ["en"].map(async (language, i) => {
+      let i18nPathname = pathname;
+      console.log(i18nPathname);
       if (i !== 0) i18nPathname.unshift(language);
-      
-      // TODO:  get the page content (and template) to send as props
-      const thePath = i18nPathname.join("/");
-      // const contentEndpoint =pagesApi +"/" +thePath;
-      // // const content = await fetch(
-      // // contentEndpoint
-      // // ).then((res) => res.json());
 
-      paths.push({
-        params: {
-          page: i18nPathname.length ? i18nPathname.join("/") : undefined,
-        },
+      // Get the page content (and template) to send as props
+      // TODO - investigate - Fetch the content here or in getStaticPaths
+      const relativePathToContent = nodeName + "/" + i18nPathname.join("/");
+      const contentEndpoint = pagesApi + "/" + relativePathToContent;
+      const content = await fetch(contentEndpoint)
+        .then((res) => res.json())
+        .catch((e) => console.error("ERROR", e));
+      console.log({
+        relativePathToContent: relativePathToContent || nodeName,
+        contentEndpoint,
       });
+      const page = i18nPathname.join("/") || undefined;
+      const result = {
+        params: {
+          page,
+        },
+        props: {
+          title: content.title || "",
+          template: content["mgnl:template"] || "basic",
+          content,
+          relativePathToContent,
+        },
+      };
+
+      paths.push(result);
     });
 
-    node["@nodes"].forEach((nodeName) => getStaticPath(node[nodeName], paths));
+    const processSubNodes = node["@nodes"].map((nodeName) =>
+      getStaticPath(node[nodeName], paths)
+    );
+    await Promise.all([...processLangages, ...processSubNodes]);
   }
   const nodeName = "/astro-minimal";
   // const nodeName = "";
-
-  let paths = [];
 
   const navRes = await fetch(pagenavApi + nodeName);
   if (!navRes.ok) {
     return { paths: [], fallback: false };
   }
   const nav = await navRes.json();
-
-  getStaticPath(nav, paths);
-
-  // TODO: send the real paths, not hardcoded one
-  return [
-    { params: { page: 'astro-minimal' } },
-    {
-      params: { page: undefined },
-    }
-  ]
-  // return paths;
+  const paths = [];
+  await getStaticPath(nav, paths);
+  return paths;
 }
 
-const content = await fetch(
-  "http://localhost:8080/magnoliaAuthor/.rest/delivery/pages/v1/astro-minimal/"
-).then((res) => res.json());
 const templateAnnotations = await fetch(
   "http://localhost:8080/magnoliaAuthor/.rest/template-annotations/v1/astro-minimal/"
 ).then((res) => res.json());
 
+const { title, template, relativePathToContent } = Astro.props;
 
+// TODO - investigate - Fetch the content here or in getStaticPaths
+const content = await fetch(
+  "http://localhost:8080/magnoliaAuthor/.rest/delivery/pages/v1" +
+    relativePathToContent
+).then((res) => res.json());
 ---
+
 <html>
   <head>
     <title>Basic</title>
   </head>
   <body class="max-w-md mx-auto">
-    <MainLayout content={content} templateAnnotations={templateAnnotations} title="Basic Page">
-
-    <h1>Main</h1>
-    <editable-area
-      content={JSON.stringify(content["main"])}
-      annotations={JSON.stringify(templateAnnotations)}
+    <MainLayout
+      content={content}
+      templateAnnotations={templateAnnotations}
+      title={title}
     >
-    </editable-area>
+      <editable-area
+        content={JSON.stringify(content["main"])}
+        annotations={JSON.stringify(templateAnnotations)}
+      >
+      </editable-area>
 
-    <h1>Extras</h1>
-    <editable-area
-      content={JSON.stringify(content["extras"])}
-      annotations={JSON.stringify(templateAnnotations)}
-    >
-    </editable-area>
-  </MainLayout>
+      <h1>Extras</h1>
+      <editable-area
+        content={JSON.stringify(content["extras"])}
+        annotations={JSON.stringify(templateAnnotations)}
+      >
+      </editable-area>
+    </MainLayout>
   </body>
 </html>
-
-
 
 <script>
   import provideCivicUiDesignSystem from "../../utils/register";
