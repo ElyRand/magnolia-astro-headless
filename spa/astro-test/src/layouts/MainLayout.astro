@@ -4,7 +4,7 @@ const { content, templateAnnotations, title } = Astro.props;
 
 <html>
   <head>
-    <title>Basic</title>
+    <title>{title}</title>
   </head>
   <body class="max-w-md mx-auto">
     <h1>{title}</h1>
@@ -13,7 +13,7 @@ const { content, templateAnnotations, title } = Astro.props;
       annotations={JSON.stringify(templateAnnotations)}
     >
     </editable-page>
-    <!-- TODO the slot should be in beetwwen editable-page ? -->
+    <!-- TODO the slot should be in beetween editable-page ? -->
     <slot />
   </body>
 </html>
